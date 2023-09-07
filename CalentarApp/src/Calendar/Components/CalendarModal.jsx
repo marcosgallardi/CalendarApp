@@ -1,14 +1,17 @@
 import { useMemo, useState } from "react";
 import Modal from "react-modal";
+
 import "../../styles.css";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+
 import { addHours, differenceInSeconds } from "date-fns";
 import DatePicker, { registerLocale } from "react-datepicker";
 import es from "date-fns/locale/es";
 registerLocale("es", es);
-
 import "react-datepicker/dist/react-datepicker.css";
+
+import { useUiStore } from "../../hooks";
 
 const customStyles = {
   content: {
@@ -24,7 +27,8 @@ const customStyles = {
 Modal.setAppElement();
 
 export const CalendarModal = () => {
-  const [isOpen, setIsOpen] = useState(true);
+  const { isDateModalOpen, closeModal } = useUiStore();
+
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [formValues, setFormValues] = useState({
@@ -33,15 +37,15 @@ export const CalendarModal = () => {
     start: new Date(),
     end: addHours(new Date(), 2),
   });
-  
-//useMemo para que cuando el formValues.title cambie y el formSubmited tambien cambie el estilo del imput hay error
+
+  //useMemo para que cuando el formValues.title cambie y el formSubmited tambien cambie el estilo del imput hay error
   const titleClass = useMemo(() => {
     if (!formSubmitted) return "";
     return formValues.title.length > 0 ? "is-valid" : "is-invalid";
   }, [formValues.title, formSubmitted]);
 
   const onCloseModal = () => {
-    setIsOpen(false);
+    closeModal();
   };
 
   const onInputChange = ({ target }) => {
@@ -74,10 +78,10 @@ export const CalendarModal = () => {
       return;
     }
   };
-
+  console.log("modal", isDateModalOpen);
   return (
     <Modal
-      isOpen={isOpen}
+      isOpen={isDateModalOpen}
       onRequestClose={onCloseModal}
       style={customStyles}
       className="modal"

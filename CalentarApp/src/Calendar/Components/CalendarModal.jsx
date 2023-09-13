@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Modal from "react-modal";
 
 import "../../styles.css";
@@ -11,7 +11,7 @@ import es from "date-fns/locale/es";
 registerLocale("es", es);
 import "react-datepicker/dist/react-datepicker.css";
 
-import { useUiStore } from "../../hooks";
+import { useCalendarStore, useUiStore } from "../../hooks";
 
 const customStyles = {
   content: {
@@ -29,11 +29,13 @@ Modal.setAppElement();
 export const CalendarModal = () => {
   const { isDateModalOpen, closeModal } = useUiStore();
 
+  const { activeEvents, startSavingEvent } = useCalendarStore();
+
   const [formSubmitted, setFormSubmitted] = useState(false);
 
   const [formValues, setFormValues] = useState({
-    title: "marcos",
-    notes: "gallardi",
+    title: "",
+    notes: "",
     start: new Date(),
     end: addHours(new Date(), 2),
   });
@@ -56,7 +58,14 @@ export const CalendarModal = () => {
     setFormValues({ ...formValues, [chaning]: event });
   };
 
-  const onSubmitForm = (event) => {
+  useEffect(() => {
+    //si no hago el if el valor de formvalues al inicial va a ser = a null y los campos van a aparece vacios o van a romper
+    if (activeEvents !== null) {
+      setFormValues({ ...activeEvents });
+    }
+  }, [activeEvents]);
+
+  const onSubmitForm = async (event) => {
     event.preventDefault();
 
     //forma de saber que el form se intento postear
@@ -66,7 +75,7 @@ export const CalendarModal = () => {
     //forma de ver la diferencia de horario entre inicio y fin de evento
     const difference = differenceInSeconds(formValues.end, formValues.start);
     //forma de ver la diferencia de horario entre inicio y fin de evento
-    console.log({ difference });
+   
     if (isNaN(difference) || difference <= 0) {
       Swal.fire("Fechas incorrectas", "Revisar fechas ingresadas", "error");
 
@@ -77,8 +86,11 @@ export const CalendarModal = () => {
       alert("Falta titulo");
       return;
     }
+    console.log("form values",formValues)
+    await startSavingEvent(formValues);
+    closeModal();
   };
-  console.log("modal", isDateModalOpen);
+  
   return (
     <Modal
       isOpen={isDateModalOpen}

@@ -50,8 +50,10 @@
 .fab-danger{
     border-radius: 100%;
     bottom: 25px;
-    font-size: 30px;
-    padding: 25px;
+    font-size: 22px;
+    
     position: fixed;
     left: 25px;
+    height: 60px;
+    width: 60px;
 }

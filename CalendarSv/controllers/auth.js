@@ -1,4 +1,4 @@
-const { validationResult } = require("express-validator");
+
 
 const crearUsuario = (req, res) => {
   const { name, email, password } = req.body;
